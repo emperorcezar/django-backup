@@ -2,7 +2,7 @@ import os, popen2, time
 from datetime import datetime
 from optparse import make_option
 
-from django.core.management.base import BaseCommand
+from django.core.management.base import BaseCommand, CommandError
 from django.core.mail import EmailMessage
 from django.conf import settings
 
@@ -30,12 +30,12 @@ class Command(BaseCommand):
         from django.db import connection
         from django.conf import settings
 
-        self.engine = settings.DATABASE_ENGINE
-        self.db = settings.DATABASE_NAME
-        self.user = settings.DATABASE_USER
-        self.passwd = settings.DATABASE_PASSWORD
-        self.host = settings.DATABASE_HOST
-        self.port = settings.DATABASE_PORT
+        self.engine = settings.DATABASES['default']['ENGINE']
+        self.db = settings.DATABASES['default']['NAME']
+        self.user = settings.DATABASES['default']['USER']
+        self.passwd = settings.DATABASES['default']['PASSWORD']
+        self.host = settings.DATABASES['default']['HOST']
+        self.port = settings.DATABASES['default']['PORT']
 
         backup_dir = 'backups'
         if not os.path.exists(backup_dir):
@@ -44,10 +44,10 @@ class Command(BaseCommand):
         outfile = os.path.join(backup_dir, 'backup_%s.sql' % self._time_suffix())
 
         # Doing backup
-        if self.engine == 'mysql':
+        if self.engine.split('.')[-1] == 'mysql':
             print 'Doing Mysql backup to database %s into %s' % (self.db, outfile)
             self.do_mysql_backup(outfile)
-        elif self.engine in ('postgresql_psycopg2', 'postgresql'):
+        elif self.engine.split('.')[-1] in ('postgresql_psycopg2', 'postgresql'):
             print 'Doing Postgresql backup to database %s into %s' % (self.db, outfile)
             self.do_postgresql_backup(outfile)
         else:
