@@ -15,7 +15,7 @@ class Command(BaseCommand):
         make_option('--compress', '-c', action='store_true', default=False, dest='compress',
             help='Compress dump file'),
         make_option('--file', '-f', action='store', dest='filename',
-            help='Compress dump file'),
+            help='Name the output file'),
         make_option('--directory', '-d', action='append', default=[], dest='directories',
             help='Compress dump file'),
     )
@@ -28,6 +28,7 @@ class Command(BaseCommand):
         self.email = options.get('email')
         self.compress = options.get('compress')
         self.directories = options.get('directories')
+        self.filename = options.get('filename', False)
 
         from django.db import connection
         from django.conf import settings
@@ -51,9 +52,9 @@ class Command(BaseCommand):
         if not os.path.exists(backup_dir):
             os.makedirs(backup_dir)
 
-        try:
+        if self.filename
             outfile = os.path.join(backup_dir, '%s' % self.filename)
-        except AttributeError:
+        else
             outfile = os.path.join(backup_dir, 'backup_%s.sql' % self._time_suffix())
 
         # Doing backup
