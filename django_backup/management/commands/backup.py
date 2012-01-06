@@ -14,7 +14,7 @@ class Command(BaseCommand):
             help='Sends email with attached dump file'),
         make_option('--compress', '-c', action='store_true', default=False, dest='compress',
             help='Compress dump file'),
-        make_option('--file', '-f', action='store', default=False, dest='filename',
+        make_option('--file', '-f', action='store', dest='filename',
             help='Compress dump file'),
         make_option('--directory', '-d', action='append', default=[], dest='directories',
             help='Compress dump file'),
@@ -51,9 +51,9 @@ class Command(BaseCommand):
         if not os.path.exists(backup_dir):
             os.makedirs(backup_dir)
 
-        if self.filename:
+        try:
             outfile = os.path.join(backup_dir, '%s' % self.filename)
-        else:
+        except AttributeError:
             outfile = os.path.join(backup_dir, 'backup_%s.sql' % self._time_suffix())
 
         # Doing backup
