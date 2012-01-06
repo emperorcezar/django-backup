@@ -14,6 +14,8 @@ class Command(BaseCommand):
             help='Sends email with attached dump file'),
         make_option('--compress', '-c', action='store_true', default=False, dest='compress',
             help='Compress dump file'),
+        make_option('--file', '-f', action='store', dest='filename',
+            help='Compress dump file'),
         make_option('--directory', '-d', action='append', default=[], dest='directories',
             help='Compress dump file'),
     )
@@ -30,18 +32,29 @@ class Command(BaseCommand):
         from django.db import connection
         from django.conf import settings
 
-        self.engine = settings.DATABASES['default']['ENGINE']
-        self.db = settings.DATABASES['default']['NAME']
-        self.user = settings.DATABASES['default']['USER']
-        self.passwd = settings.DATABASES['default']['PASSWORD']
-        self.host = settings.DATABASES['default']['HOST']
-        self.port = settings.DATABASES['default']['PORT']
+        try:
+            self.engine = settings.DATABASES['default']['ENGINE']
+            self.db = settings.DATABASES['default']['NAME']
+            self.user = settings.DATABASES['default']['USER']
+            self.passwd = settings.DATABASES['default']['PASSWORD']
+            self.host = settings.DATABASES['default']['HOST']
+            self.port = settings.DATABASES['default']['PORT']
+        except AttributeError:
+            self.engine = settings.DATABASE_ENGINE
+            self.db = settings.DATABASE_NAME
+            self.user = settings.DATABASE_USER
+            self.passwd = settings.DATABASE_PASSWORD
+            self.host = settings.DATABASE_HOST
+            self.port = settings.DATABASE_PORT
 
         backup_dir = 'backups'
         if not os.path.exists(backup_dir):
             os.makedirs(backup_dir)
 
-        outfile = os.path.join(backup_dir, 'backup_%s.sql' % self._time_suffix())
+        if self.filename:
+            outfile = os.path.join(backup_dir, '%s' % self.filename)
+        else:
+            outfile = os.path.join(backup_dir, 'backup_%s.sql' % self._time_suffix())
 
         # Doing backup
         if self.engine.split('.')[-1] == 'mysql':
