@@ -52,9 +52,9 @@ class Command(BaseCommand):
         if not os.path.exists(backup_dir):
             os.makedirs(backup_dir)
 
-        if self.filename
+        if self.filename:
             outfile = os.path.join(backup_dir, '%s' % self.filename)
-        else
+        else:
             outfile = os.path.join(backup_dir, 'backup_%s.sql' % self._time_suffix())
 
         # Doing backup
