@@ -14,7 +14,7 @@ class Command(BaseCommand):
             help='Sends email with attached dump file'),
         make_option('--compress', '-c', action='store_true', default=False, dest='compress',
             help='Compress dump file'),
-        make_option('--file', '-f', action='store', dest='filename',
+        make_option('--file', '-f', action='store', default=False, dest='filename',
             help='Compress dump file'),
         make_option('--directory', '-d', action='append', default=[], dest='directories',
             help='Compress dump file'),
